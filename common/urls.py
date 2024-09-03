@@ -1,9 +1,7 @@
-from timeit import template
 
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
-from config.settings import LOGIN_REDIRECT_URL
 
 app_name =  'common'
 
