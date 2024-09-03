@@ -1,5 +1,3 @@
-from tkinter.font import names
-
 from django.urls import path
 from pybo.views import base_views,question_views,answer_views,commen_views,vote_views
 
