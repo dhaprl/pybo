@@ -11,6 +11,7 @@ from django.contrib import messages
 from django.db.models import Q, Count
 
 def index(request):
+    3/0
     """
 
     pybo 목록 출력
@@ -20,6 +21,7 @@ def index(request):
     page = request.GET.get('page', '1') #페이지
     kw = request.GET.get('kw','') #검색어
     so = request.GET.get('so','recent')
+
     #create_date 변수에 -를 붙여서 역순으로 정렬한다. (order_by)
     #조회(최근 순)
     if so == 'recommend':
