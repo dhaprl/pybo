@@ -8,7 +8,6 @@ from ..forms import CommentForm
 from ..models import Question, Answer,Comment
 
 @login_required(login_url = 'common:login')
-
 def comment_create_question(request,question_id):
     """
     질문
@@ -28,7 +27,7 @@ def comment_create_question(request,question_id):
     else:
         form = CommentForm()
     context={'form': form}
-    return redirect (request,'pybo/comment_form.html',context)
+    return render(request,'pybo/comment_form.html',context)
 
 @login_required(login_url = 'common:login')
 def comment_modify_question(request,comment_id):
