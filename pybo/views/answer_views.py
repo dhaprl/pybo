@@ -64,4 +64,4 @@ def answer_delete(request,answer_id):
         messages.error(request, '삭제 권한이 없습니다')
     else:
         answer.delete()
-    return  redirect('pybo:detail', qusetion_id = answer.question.id)
+    return  redirect('pybo:detail', question_id = answer.question.id)
