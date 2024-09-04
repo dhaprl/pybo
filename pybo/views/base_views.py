@@ -9,9 +9,11 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count
+import logging
+logger = logging.getLogger('pybo')
 
 def index(request):
-
+    logger.info("INFO 레벨로 출력")
     """
 
     pybo 목록 출력
@@ -21,10 +23,6 @@ def index(request):
     page = request.GET.get('page', '1') #페이지
     kw = request.GET.get('kw','') #검색어
     so = request.GET.get('so','recent')
-    #log test
-    0/3
-    0/1
-    1/0
     #
     #create_date 변수에 -를 붙여서 역순으로 정렬한다. (order_by)
     #조회(최근 순)
