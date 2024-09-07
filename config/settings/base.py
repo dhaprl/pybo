@@ -136,6 +136,9 @@ ALLOWED_FILE_TYPES=[
     'image/jpeg',
     'image/png',
     'image/gif',
+    'image2/jpeg',
+    'image2/png',
+    'image2/gif',
 
 ]
 

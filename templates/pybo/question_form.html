@@ -3,20 +3,32 @@
 {% block content %}
 <style>
     .image-preview {
-        max-width: 300px;
+        max-width: 100%;
         max-height: 300px;
         margin-top: 10px;
-        margin-left: 100px;
     }
-    #drop-zone {
+
+    .drop-zone {
         border: 2px dashed #007bff;
         padding: 10px;
-        margin-top: 10px;
         text-align: center;
         transition: background-color 0.3s ease;
+        height: 150px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+        position: relative;
     }
-    #drop-zone.hover {
+
+    .drop-zone.hover {
         background-color: #e9ecef;
+    }
+
+    .drop-zone .drop-text {
+        position: absolute;
+        z-index: 10;
     }
 </style>
 
@@ -45,76 +57,114 @@
         <div class="form-group">
             <label for="content">내용</label>
             <textarea name="content" id="content" class="form-control" rows="10">{{ form.content.value|default_if_none:'' }}</textarea>
-            
-            <div class="form-group">
-                <label for="id_image">업로드 이미지:</label>
-                <input 
-                    type="file" 
-                    name="image" 
-                    id="id_image" 
-                    accept="image/*"
-                >
-                <div id="drop-zone">파일을 여기에 드래그 앤 드롭 하세요</div>
-            </div>  
-
-            <div id="image-preview-container"></div>
-
         </div>
 
-        <button type="submit" class="btn btn-primary">저장하기</button>
+        <!-- 이미지 업로드 구역 -->
+        <div class="row">
+            <!-- 첫 번째 이미지 업로드 -->
+            <div class="col-md-6">
+                <label for="id_image1">업로드 이미지1:</label>
+                <input type="file" name="image1" id="id_image1" accept="image/*" class="form-control">
+                <div id="drop-zone1" class="drop-zone">
+                    <span class="drop-text">Drag N Drop1</span>
+                    <div id="image-preview-container1"></div>
+                </div>
+            </div>
+            <!-- 두 번째 이미지 업로드 -->
+            <div class="col-md-6">
+                <label for="id_image2">업로드 이미지2:</label>
+                <input type="file" name="image2" id="id_image2" accept="image/*" class="form-control">
+                <div id="drop-zone2" class="drop-zone">
+                    <span class="drop-text">Drag N Drop2</span>
+                    <div id="image-preview-container2"></div>
+                </div>
+            </div>
+        </div>
 
+        <button type="submit" class="btn btn-primary mt-3">저장하기</button>
     </form>
 </div>
+{% endblock %}
 
+{% block script %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const dropZone = document.getElementById('drop-zone');
-        const imageInput = document.querySelector('input[name="image"]');
-        const previewContainer = document.getElementById('image-preview-container');
-        const imagePreview = document.createElement('img');
-        imagePreview.classList.add('image-preview');
-    
-        previewContainer.appendChild(imagePreview);
+    $(document).ready(function() {
+        // 이미지1에 대한 미리보기 및 드래그 앤 드롭 설정
+        setupImageUpload('#id_image1', '#drop-zone1', '#image-preview-container1');
+        
+        // 이미지2에 대한 미리보기 및 드래그 앤 드롭 설정
+        setupImageUpload('#id_image2', '#drop-zone2', '#image-preview-container2');
+        
+        /*
+        이미지 업로드 및 미리보기 설정 함수
+        inputId: 파일 input 요소의 ID
+        dropZoneId: 드래그 앤 드롭 영역의 ID
+        previewContainerId: 미리보기 이미지가 표시될 컨테이너의 ID
+        */
+        function setupImageUpload(inputId, dropZoneId, previewContainerId) {
+            const $dropZone = $(dropZoneId);  // 드래그 앤 드롭 영역
+            const $imageInput = $(inputId);  // 파일 input 요소
+            const $previewContainer = $(previewContainerId);  // 이미지 미리보기 컨테이너
+            const $imagePreview = $('<img>').addClass('image-preview');  // 미리보기 이미지 요소
+            
+            $previewContainer.append($imagePreview);  // 미리보기 이미지를 컨테이너에 추가
 
-        function previewImage(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.src = e.target.result;
-                imagePreview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+            const $dropText = $dropZone.find('.drop-text'); // 드롭 텍스트 선택
+
+            /* 이미지 미리보기 함수 */
+            function previewImage(file) {
+                const reader = new FileReader();  // FileReader 객체를 생성
+                reader.onload = function(e) {
+                    $imagePreview.attr('src', e.target.result);  // 이미지 데이터를 미리보기 요소에 적용
+                    $imagePreview.show();  // 미리보기를 화면에 표시
+                    if ($dropText.length) {
+                        $dropText.hide();  // 이미지가 있을 경우 텍스트 숨김
+                    }
+                };
+                reader.readAsDataURL(file);  // 파일을 읽어서 base64로 변환
+            }
+
+            /* 드래그 앤 드롭 영역에 파일을 드래그 중일 때 */
+            $dropZone.on('dragover', function(event) {
+                event.preventDefault();  // 기본 동작을 막고, 드래그된 파일을 허용
+                $dropZone.addClass('hover');  // 드래그 중일 때 스타일 변경
+            });
+
+            /* 드래그가 영역을 떠났을 때 스타일 변경 */
+            $dropZone.on('dragleave', function(event) {
+                event.preventDefault();  // 기본 동작을 막음
+                $dropZone.removeClass('hover');  // 스타일 원래대로 변경
+            });
+
+            /* 파일이 드롭되었을 때 */
+            $dropZone.on('drop', function(event) {
+                event.preventDefault();  // 기본 동작을 막고 드롭된 파일을 처리
+                $dropZone.removeClass('hover');  // 드래그 중 스타일 제거
+                const files = event.originalEvent.dataTransfer.files;
+                if (files.length > 0 && files[0].type.startsWith('image/')) {
+                    $imageInput.prop('files', files);  // 드롭된 파일을 input에 반영
+                    previewImage(files[0]);  // 미리보기 이미지를 업데이트
+                } else {
+                    $imagePreview.attr('src', '').hide();  // 이미지 파일이 아니면 미리보기 제거
+                    if ($dropText.length) {
+                        $dropText.show();  // 텍스트 다시 표시
+                    }
+                }
+            });
+
+            /* 파일 input이 변경되었을 때 (파일 선택) */
+            $imageInput.on('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    previewImage(file);  // 선택된 파일을 미리보기로 표시
+                } else {
+                    $imagePreview.attr('src', '').hide();  // 파일이 없으면 미리보기 제거
+                    if ($dropText.length) {
+                        $dropText.show();  // 텍스트 다시 표시
+                    }
+                }
+            });
         }
-
-        dropZone.addEventListener('dragover', function(event) {
-            event.preventDefault();
-            dropZone.classList.add('hover');
-        });
-
-        dropZone.addEventListener('dragleave', function(event) {
-            event.preventDefault();
-            dropZone.classList.remove('hover');
-        });
-
-        dropZone.addEventListener('drop', function(event) {
-            event.preventDefault();
-            dropZone.classList.remove('hover');
-            const files = event.dataTransfer.files;
-            if (files.length > 0 && files[0].type.startsWith('image/')) {
-                imageInput.files = files;  // 드롭된 파일을 input에 반영
-                previewImage(files[0]);
-            } else {
-                imagePreview.src = '';
-            }
-        });
-
-        imageInput.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                previewImage(file);
-            } else {
-                imagePreview.src = '';
-            }
-        });
     });
 </script>
 {% endblock %}
