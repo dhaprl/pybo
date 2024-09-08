@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .drop-zone {
+        border: 2px dashed #007bff;
+        padding: 10px;
+        text-align: center;
+        transition: background-color 0.3s ease;
+        height: 150px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+        position: relative;
+    }
+
+    .drop-zone.hover {
+        background-color: #e9ecef;
+    }
+
+    .drop-zone .drop-text {
+        position: absolute;
+        z-index: 10;
+    }
+
+    /* 모달 스타일 */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        width: 400px;
+        position: relative;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    /* 비활성화된 버튼 스타일 */
+    .btn[disabled] {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+
+    /* 숨겨진 파일 입력 요소 */
+    .file-input {
+        opacity: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .image-preview {
+        max-width: 100px;
+        max-height: 100px;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="container">
+    <h5 class="my-3 border-bottom pb-2">
+        {% if form.instance.pk %}
+            질문 수정
+        {% else %}
+            질문 등록
+        {% endif %}
+    </h5>
+    <form id="questionForm" method="post" class="post-form my-3" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for field in form %}
+                    {% if field.errors %}
+                        <strong>{{ field.label }}</strong>
+                        {{ field.errors }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="subject">제목</label>
+            <input type="text" name="subject" id="subject" class="form-control" value="{{ form.subject.value|default_if_none:'' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea name="content" id="content" class="form-control" rows="10">{{ form.content.value|default_if_none:'' }}</textarea>
+        </div>
+
+        <!-- 업로드 팝업 열기 -->
+        <button type="button" id="uploadBtn" class="btn btn-secondary mt-3">이미지 업로드</button>
+
+        <!-- 이미지 업로드 후 메인 화면에 미리보기 표시 -->
+        <div id="image-preview-container" class="my-3">
+            {% if form.instance.image1 %}
+                <img src="{{ form.instance.image1.url }}" alt="Uploaded Image 1" class="image-preview" id="image-preview1">
+            {% endif %}
+            {% if form.instance.image2 %}
+                <img src="{{ form.instance.image2.url }}" alt="Uploaded Image 2" class="image-preview" id="image-preview2">
+            {% endif %}
+
+        <button type="submit" class="btn btn-primary mt-3">
+            {% if form.instance.pk %}
+                저장하기
+            {% else %}
+                등록하기
+            {% endif %}
+        </button>
+    </form>
+</div>
+
+<!-- 업로드 모달 -->
+<div id="uploadModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>이미지 업로드</h2>
+
+        <!-- 첫 번째 이미지 드래그 앤 드롭 -->
+        <div id="drop-zone1" class="drop-zone">
+            <span class="drop-text">여기에 이미지1을 드롭하거나 클릭하여 업로드하세요.</span>
+            <input type="file" id="image1" class="file-input" accept="image/*">
+        </div>
+
+        <!-- 두 번째 이미지 드래그 앤 드롭 -->
+        <div id="drop-zone2" class="drop-zone mt-3">
+            <span class="drop-text">여기에 이미지2를 드롭하거나 클릭하여 업로드하세요.</span>
+            <input type="file" id="image2" class="file-input" accept="image/*">
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block script %}
+
+
+<script>
+
+$(document).ready(function() {
+    const modal = $('#uploadModal');
+    const uploadBtn = $('#uploadBtn');
+    const closeBtn = $('.close-btn');
+    const subjectInput = $('#subject');
+
+    const contentInput = $('#content');
+    const questionForm = $('#questionForm');
+
+    const imagePreviewContainer = $('#image-preview-container');
+
+    const imageUploadSettings = [
+        { input: '#image1', dropZone: '#drop-zone1', previewId: '#image-preview1' },
+        { input: '#image2', dropZone: '#drop-zone2', previewId: '#image-preview2' }
+    ];
+
+    function setupImageUpload(inputSelector, dropZoneSelector, previewId) {
+        const $dropZone = $(dropZoneSelector);
+        const $fileInput = $(inputSelector);
+        const $dropText = $dropZone.find('.drop-text');
+        const $imagePreview = $(previewId);
+
+        $dropZone.on('dragover', function(event) {
+            event.preventDefault();
+            $dropZone.addClass('hover');
+        });
+
+        $dropZone.on('dragleave', function() {
+            $dropZone.removeClass('hover');
+        });
+
+        $dropZone.on('drop', function(event) {
+            event.preventDefault();
+            $dropZone.removeClass('hover');
+            const files = event.originalEvent.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                $fileInput[0].files = files;
+                $dropText.hide();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $imagePreview.attr('src', e.target.result);
+                }
+                reader.readAsDataURL(files[0]);
+            }
+        });
+
+        $dropZone.on('click', function() {
+            $fileInput.click();
+        });
+
+        $fileInput.on('change', function(event) {
+            if (event.target.files.length > 0) {
+                $dropText.hide();
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $imagePreview.attr('src', e.target.result);
+                }
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        });
+    }
+
+    function checkFormValidity() {
+        const subjectValid = subjectInput.val().trim() !== '';
+        const contentValid = contentInput.val().trim() !== '';
+        uploadBtn.prop('disabled', !(subjectValid && contentValid));
+    }
+
+    uploadBtn.on('click', function() {
+        modal.css('display', 'flex');
+    });
+
+    closeBtn.on('click', function() {
+        modal.hide();
+    });
+
+    imageUploadSettings.forEach(setting => {
+        setupImageUpload(setting.input, setting.dropZone, setting.previewId);
+    });
+
+    subjectInput.add(contentInput).on('input', checkFormValidity);
+    checkFormValidity();
+
+    // 폼 제출 처리
+    questionForm.on('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(this);
+
+        // 이미지 파일 추가
+        imageUploadSettings.forEach(setting => {
+            const fileInput = $(setting.input)[0];
+            if (fileInput.files.length > 0) {
+                formData.append(fileInput.id, fileInput.files[0]); // image1, image2 추가
+            }
+        });
+
+        const isModify = '{{ form.instance.pk|yesno:"true,false" }}';
+        const questionId = '{{ form.instance.pk }}';
+        const url = isModify === 'true'
+            ? '{% url "pybo:question_modify" question_id=0 %}'.replace('0', questionId)
+            : '{% url "pybo:question_create" %}';
+
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            success: function(response) {
+                window.location.href = response.redirect_url; // 성공 시 리다이렉트
+            },
+            error: function(xhr, status, error) {
+                alert('질문 등록/수정 실패: ' + error);
+            }
+        });
+    });
+});
+
+</script>
+{% endblock %}

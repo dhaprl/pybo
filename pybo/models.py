@@ -1,5 +1,9 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import User
+
+
 
 # ==========================
 # Question 모델 (질문 데이터)
@@ -28,10 +32,24 @@ class Question(models.Model):
     voter = models.ManyToManyField(User, related_name='voter_question')
     
     # 이미지1: 질문에 첨부된 이미지, null과 빈 값을 허용
-    image1 = models.ImageField(upload_to='image1/', null=True, blank=True, verbose_name='업로드 이미지1')
+    image1 = models.ImageField(upload_to='image1/', null=False, blank=False, verbose_name='업로드 이미지1')
     
     # 이미지2: 질문에 첨부된 두 번째 이미지, null과 빈 값을 허용
-    image2 = models.ImageField(upload_to='image2/', null=True, blank=True, verbose_name='업로드 이미지2')
+    image2 = models.ImageField(upload_to='image2/', null=False, blank=False, verbose_name='업로드 이미지2')
+
+    #save 메서드를 사용해서 기존 파일을 삭제하고 새 파일로 교체
+    def save(self,*args,**kwargs):
+        from .forms import QuestionForm
+        if self.pk:
+            old_objects= Question.objects.get(pk=self.pk)
+            if old_objects.image1 and old_objects.image1 !=self.image1:
+                if os.path.isfile(old_objects.image1.path):
+                    os.remove(old_objects.image1.path)
+            if old_objects.image2 and old_objects.image2 != self.image2:
+                if os.path.isfile(old_objects.image2.path):
+                    os.remove(old_objects.image2.path)
+        #장고의 save 메세지를 호출하여 모델 인스턴스에 저장
+        super(Question,self).save(*args,*kwargs)
 
     # 객체를 문자열로 표현할 때 질문 제목을 반환
     def __str__(self):
