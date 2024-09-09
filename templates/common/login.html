@@ -1,33 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% comment %} 로그인 페이지 컨테이너 시작 {% endcomment %}
 <div class="container my-3">
     <div class="row">
         <div class="col-4">
+            {% comment %} 로그인 제목 {% endcomment %}
             <h4>로그인</h4>
         </div>
         <div class="col-8 text-right">
+            {% comment %} 회원가입 안내 링크. 계정이 없을 경우 회원가입 페이지로 이동 {% endcomment %}
             <span>
                 아직 계정이 없으신가요? <a href="{% url 'common:signup' %}">계정을 만들어</a>
             </span>
         </div>
     </div>
+
+    {% comment %} 로그인 폼 시작, POST 요청으로 로그인 처리 {% endcomment %}
     <form method="post" action="{% url 'common:login' %}">
-        {% csrf_token %}
-        {% comment %} 
-            로그인 성공후 이동되는 URL, next 파라미터에 있는 URL 페이지로 이동하겠다는 의미 
-        {% endcomment %}
+        {% csrf_token %}  <!-- CSRF 보안을 위한 토큰 -->
+
+        {% comment %} 로그인 성공 후 이동할 URL, 'next' 파라미터가 있을 경우 해당 페이지로 이동 {% endcomment %}
         <input type="hidden" name="next" value="{{ next }}">  
+
+        {% comment %} 폼 입력 중 발생한 오류 메시지를 출력하는 템플릿 포함 {% endcomment %}
         {% include "form_errors.html" %}
+
+        {% comment %} 사용자 ID 입력 필드 {% endcomment %}
         <div class="mb-3">
             <label for="username">사용자ID</label>
             <input type="text" class="form-control" name="username" id="username" value="{{ form.username.value|default_if_none:'' }}">
         </div>
+
+        {% comment %} 비밀번호 입력 필드 {% endcomment %}
         <div class="mb-3">
             <label for="password">비밀번호</label>
             <input type="password" class="form-control" name="password" id="password" value="{{ form.password.value|default_if_none:'' }}">
         </div>
+
+        {% comment %} 로그인 버튼 {% endcomment %}
         <button type="submit" class="btn btn-primary">로그인</button>
     </form>
 </div>
+{% comment %} 로그인 페이지 컨테이너 끝 {% endcomment %}
 {% endblock %}

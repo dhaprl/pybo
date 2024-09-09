@@ -10,14 +10,17 @@
 
     <div class="row my-3">
         <div class="col-6">
+            {% comment %} 질문 등록 버튼 {% endcomment %}
             <a href="{% url 'pybo:question_create' %}" class="btn btn-primary">질문 등록</a>
         </div>
 
         {% comment %} 검색창 start {% endcomment %}
         <div class="col-6">
             <div class="input-group">
+                {% comment %} 검색 키워드를 입력하는 필드 {% endcomment %}
                 <input type="text" id="search_kw" class="form-control" value="{{ kw|default_if_none:'' }}">
                 <div class="input-group-append">
+                    {% comment %} 검색 버튼 {% endcomment %}
                     <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
                 </div>
             </div>
@@ -40,25 +43,30 @@
             {% if QList %}
                 {% for question in QList %}
                     <tr class="text-center">
+                        {% comment %} 질문 번호 계산 및 출력 {% endcomment %}
                         <td>
                             {{ QList.paginator.count|sub:QList.start_index|sub:forloop.counter0|add:1 }}
                         </td>
+                        {% comment %} 추천 수 출력 (추천이 1개 이상일 때만 출력) {% endcomment %}
                         <td>
                             {% if question.voter.all.count > 0 %}
                                 <span class="badge badge-warning">{{ question.voter.all.count }}</span> 
                             {% endif %}
                         </td>
+                        {% comment %} 질문 제목 및 답변 개수 출력 {% endcomment %}
                         <td class="text-start">
                             <a href="{% url 'pybo:detail' question.id %}">{{ question.subject }}</a>
                             {% if question.answer_set.count > 0 %}
                                 <span class="text-danger small mx-2">{{ question.answer_set.count }}</span>
                             {% endif %}
                         </td>
+                        {% comment %} 질문 작성자 및 작성 날짜 출력 {% endcomment %}
                         <td>{{ question.author.username }}</td>
                         <td>{{ question.create_date }}</td>
                     </tr>
                 {% endfor %}
             {% else %}
+                {% comment %} 질문이 없을 때 출력할 메시지 {% endcomment %}
                 <tr>
                     <td colspan="4">질문이 없습니다.</td>
                 </tr>
@@ -70,26 +78,31 @@
     {% comment %} 페이징 처리 start {% endcomment %}
     <ul class="pagination justify-content-center">
         {% if QList.has_previous %}
+            {% comment %} 이전 페이지로 이동하는 링크 {% endcomment %}
             <li class="page-item">
                 <a class="page-link" data-page="{{ QList.previous_page_number }}" href="javascript:void(0)">
                     이전
                 </a>
             </li>
         {% else %}
+            {% comment %} 이전 페이지가 없으면 비활성화 {% endcomment %}
             <li class="page-item disabled">
                 <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
             </li>
         {% endif %}
 
+        {% comment %} 페이지 번호를 출력하는 반복문 {% endcomment %}
         {% for page_number in QList.paginator.page_range %}
             {% if page_number >= QList.number|add:-5 and page_number <= QList.number|add:5 %}
                 {% if page_number == QList.number %}
+                    {% comment %} 현재 페이지는 활성 상태로 표시 {% endcomment %}
                     <li class="page-item active" aria-current="page">
                         <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">
                             {{ page_number }}
                         </a>
                     </li>
                 {% else %}
+                    {% comment %} 다른 페이지 링크 {% endcomment %}
                     <li class="page-item">
                         <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">
                             {{ page_number }}
@@ -100,10 +113,12 @@
         {% endfor %}
 
         {% if QList.has_next %}
+            {% comment %} 다음 페이지로 이동하는 링크 {% endcomment %}
             <li class="page-item">
                 <a class="page-link" data-page="{{ QList.next_page_number }}" href="javascript:void(0)">다음</a>
             </li>
         {% else %}
+            {% comment %} 다음 페이지가 없으면 비활성화 {% endcomment %}
             <li class="page-item disabled">
                 <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
             </li>
@@ -114,8 +129,11 @@
 </div>
 
 {% comment %} 검색 폼 start {% endcomment %}
+{% comment %} 검색 결과를 서버로 전송하기 위한 숨겨진 폼 {% endcomment %}
 <form id="searchForm" method="get" action="{% url 'index' %}">
+    {% comment %} 검색 키워드를 서버로 전송하기 위한 숨겨진 필드 {% endcomment %}
     <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
+    {% comment %} 현재 페이지 번호를 서버로 전송하기 위한 숨겨진 필드 {% endcomment %}
     <input type="hidden" id="page" name="page" value="{{ page }}">
 </form>
 {% comment %} 검색 폼 end {% endcomment %}

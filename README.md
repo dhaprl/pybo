@@ -1,30 +1,5 @@
-
 ```
 pybo
-├─ ai_system
-│  ├─ Embedings
-│  │  └─ FaceRecognition(ResNet34).pkl
-│  ├─ fonts
-│  │  └─ NanumGothic.ttf
-│  ├─ Image
-│  │  └─ test
-│  │     └─ 새 폴더
-│  ├─ Model
-│  │  ├─ DilbCNN
-│  │  │  ├─ mmod_human_face_detector.dat
-│  │  │  └─ shape_predictor_68_face_landmarks.dat
-│  │  ├─ FairFace
-│  │  │  └─ resnet34_fair_face_4.pt
-│  │  └─ YOLOv8
-│  │     └─ yolov8n-face.pt
-│  ├─ results_test
-│  │  └─ 113.jpg
-│  ├─ systems
-│  │  └─ face_detection_system.py
-│  └─ temps
-│     ├─ AiPredict.ipynb
-│     ├─ tempCodeRunnerFile.py
-│     └─ test.py
 ├─ common
 │  ├─ admin.py
 │  ├─ apps.py
@@ -46,30 +21,52 @@ pybo
 │  ├─ wsgi.py
 │  └─ __init__.py
 ├─ manage.py
-├─ note.txt
 ├─ pybo
 │  ├─ admin.py
+│  ├─ ai_system
+│  │  ├─ ai_files
+│  │  │  ├─ ai_models
+│  │  │  ├─ backup
+│  │  │  ├─ embedings
+│  │  │  ├─ fonts
+│  │  │  ├─ image_test
+│  │  │  ├─ results_test
+│  │  │  ├─ systems_test
+│  │  │  └─ temps
+│  │  ├─ ai_pybo.py
+│  │  └─ ai_system.py
 │  ├─ apps.py
 │  ├─ forms.py
+│  ├─ migrations
+│  │  ├─ 0001_initial.py
+│  │  ├─ 0002_question_author.py
+│  │  ├─ 0003_answer_author.py
+│  │  ├─ 0004_auto_20240828_1036.py
+│  │  ├─ 0005_auto_20240828_1222.py
+│  │  ├─ 0006_auto_20240905_1250.py
+│  │  ├─ 0007_auto_20240907_1446.py
+│  │  ├─ 0008_answer_answer_image.py
+│  │  └─ __init__.py
 │  ├─ models.py
 │  ├─ templatetags
 │  │  └─ pybo_filter.py
 │  ├─ tests.py
 │  ├─ urls.py
-│  ├─ utils
-│  │  └─ face_detection_system_django.py
 │  ├─ views
 │  │  ├─ answer_views.py
 │  │  ├─ base_views.py
 │  │  ├─ comment_view.py
 │  │  └─ question_views.py
 │  └─ __init__.py
+├─ README.md
 ├─ requirements.txt
 ├─ static
 │  ├─ bootstrap.min(temp).css
 │  ├─ bootstrap.min.css
 │  ├─ bootstrap.min.js
 │  ├─ jquery-3.4.1.min.js
+│  ├─ question_form.css
+│  ├─ question_form.js
 │  └─ style.css
 └─ templates
    ├─ base.html
@@ -84,6 +81,7 @@ pybo
       ├─ comment_form.html
       ├─ question_detail.html
       ├─ question_form.html
-      └─ question_list.html
+      ├─ question_list.html
+      └─ test.html
 
 ```

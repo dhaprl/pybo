@@ -2,26 +2,26 @@
 {% block content %}
 <div class="container my-3">
 
-    {% comment %} 댓글이 있으면 리스트를 보여주기 {% endcomment %}
+    {% comment %} 댓글이 있으면 댓글 리스트를 출력 {% endcomment %}
     {% if comments %}
         <ul>
             {% for comment in comments %}
                 <li>
                     <strong>{{ comment.author }}</strong>: {{ comment.content }}
                     
-                    {% comment %} 대댓글 작성 버튼 (hidden input에 부모 댓글 ID 저장) {% endcomment %}
+                    {% comment %} 대댓글 작성 버튼 (부모 댓글 ID를 hidden input에 저장) {% endcomment %}
                     <a href="#" onclick="document.getElementById('id_parent').value='{{ comment.id }}'; return false;">대댓글 작성</a>
 
-                    {% comment %} 대댓글 작성 폼 start {% endcomment %}
+                    {% comment %} 대댓글 작성 폼 시작 {% endcomment %}
                     <form method="post" style="margin-left: 20px;">
                         {% csrf_token %}
                         {{ form.as_p }}
                         <input type="hidden" name="parent" id="id_parent" value="{{ comment.id }}">
                         <button type="submit" class="btn btn-primary">답변 저장하기</button>
                     </form>
-                    {% comment %} 대댓글 작성 폼 end {% endcomment %}
+                    {% comment %} 대댓글 작성 폼 끝 {% endcomment %}
 
-                    {% comment %} 대댓글 리스트 start {% endcomment %}
+                    {% comment %} 대댓글 리스트 출력 시작 {% endcomment %}
                     <ul>
                         {% for reply in comment.replies.all %}
                             {% if reply.parent == comment %}
@@ -31,25 +31,29 @@
                             <li>등록된 답변이 없습니다.</li>
                         {% endfor %}
                     </ul>
-                    {% comment %} 대댓글 리스트 end {% endcomment %}
+                    {% comment %} 대댓글 리스트 출력 끝 {% endcomment %}
                 </li>
             {% empty %}
                 <li>댓글이 아직 없습니다.</li>
             {% endfor %}
         </ul>
     {% else %}
-        {% comment %} 댓글 등록 폼 start {% endcomment %}
+        {% comment %} 댓글이 없을 때 댓글 작성 폼 표시 {% endcomment %}
         <h5 class="border-bottom pb-2">댓글 등록하기</h5>
+
+        {% comment %} 댓글 작성 폼 시작 {% endcomment %}
         <form method="post" class="post-form my-3">
             {% csrf_token %}
             {% include "form_errors.html" %}
+            
             <div class="form-group">
                 <label for="content">댓글 내용</label>
                 <textarea class="form-control" name="content" id="content" rows="3">{{ form.content.value|default_if_none:'' }}</textarea>
             </div>
+            
             <button type="submit" class="btn btn-primary">저장하기</button>
         </form>
-        {% comment %} 댓글 등록 폼 end {% endcomment %}
+        {% comment %} 댓글 작성 폼 끝 {% endcomment %}
     {% endif %}
 
 </div>

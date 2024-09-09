@@ -1,18 +1,23 @@
 {% comment %} 필드 오류와 넌필드 오류를 출력한다. {% endcomment %}
 {% if form.errors %}
     <div class="alert alert-danger">
+        {% comment %} 각 필드의 오류를 출력하는 루프 {% endcomment %}
         {% for field in form %}
-        {% comment %} 필드 오류 {% endcomment %}
+            {% comment %} 필드에 오류가 있을 경우 해당 오류를 출력 {% endcomment %}
             {% if field.errors %}
                 <div>
+                    {% comment %} 필드 이름을 출력 {% endcomment %}
                     <strong>{{ field.label }}</strong>
+                    {% comment %} 해당 필드의 오류 메시지를 출력 {% endcomment %}
                     {{ field.errors }}
                 </div>
             {% endif %}
         {% endfor %}
-        {% comment %} 넌필드 오류 {% endcomment %}
+
+        {% comment %} 폼 전반에 걸친 오류를 출력하는 부분 (넌필드 오류) {% endcomment %}
         {% for error in form.non_field_errors %}
             <div>
+                {% comment %} 넌필드 오류를 출력 {% endcomment %}
                 <strong>{{ error }}</strong>
             </div>
         {% endfor %}
