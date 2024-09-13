@@ -1,7 +1,3 @@
-import logging  # 로그 출력을 위한 모듈
-import cv2  # OpenCV를 사용하여 이미지 처리
-import os  # 파일 경로 처리 및 시스템 관련 작업을 위한 모듈
-#
 from .ai_system import setup_django_system  # AI 시스템 설정을 위한 데코레이터 가져오기
 
 # ===============================

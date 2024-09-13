@@ -38,15 +38,7 @@ pybo
 │  ├─ apps.py
 │  ├─ forms.py
 │  ├─ migrations
-│  │  ├─ 0001_initial.py
-│  │  ├─ 0002_question_author.py
-│  │  ├─ 0003_answer_author.py
-│  │  ├─ 0004_auto_20240828_1036.py
-│  │  ├─ 0005_auto_20240828_1222.py
-│  │  ├─ 0006_auto_20240905_1250.py
-│  │  ├─ 0007_auto_20240907_1446.py
-│  │  ├─ 0008_answer_answer_image.py
-│  │  └─ __init__.py
+│  │  ├─ ...
 │  ├─ models.py
 │  ├─ templatetags
 │  │  └─ pybo_filter.py
@@ -67,7 +59,6 @@ pybo
 │  ├─ jquery-3.4.1.min.js
 │  ├─ question_form.css
 │  ├─ question_form.js
-│  └─ style.css
 └─ templates
    ├─ base.html
    ├─ common

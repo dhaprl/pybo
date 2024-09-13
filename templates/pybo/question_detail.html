@@ -157,26 +157,24 @@
 
 {% block script %}
 <script>
-    {% comment %} 삭제 버튼 클릭 시 확인 대화상자 {% endcomment %}
-    const delete_elements = document.getElementsByClassName("delete");
+    $(document).ready(function() {
 
-    Array.from(delete_elements).forEach(function(element) {
-        element.addEventListener('click', function() {
-            if(confirm("정말로 삭제하시겠습니까?")) {
-                location.href = this.dataset.uri;
-            };
+        // 삭제 버튼 클릭 시 확인 대화상자
+        $('.delete').on('click', function() {
+            if (confirm("정말로 삭제하시겠습니까?")) {
+                location.href = $(this).data('uri');  // jQuery에서 data-attribute 접근
+            }
         });
-    });
 
-    {% comment %} 추천 버튼 클릭 시 확인 대화상자 {% endcomment %}
-    const recommend_elements = document.getElementsByClassName("recommend");
-
-    Array.from(recommend_elements).forEach(function(element) {
-        element.addEventListener('click', function() {
-            if(confirm("정말로 추천하시겠습니까?")) {
-                location.href = this.dataset.uri;
-            };
+        // 추천 버튼 클릭 시 확인 대화상자
+        $('.recommend').on('click', function() {
+            if (confirm("정말로 추천하시겠습니까?")) {
+                location.href = $(this).data('uri');  // jQuery에서 data-attribute 접근
+            }
         });
+
     });
 </script>
 {% endblock %}
+
+
