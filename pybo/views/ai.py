@@ -29,6 +29,7 @@ def process_image(image_path, selected_detectors, selected_predictors):
             continue
         detectors.append(factories.FaceDetectorFactory.create(detector, config[f'{detector}']))
     
+    # 예측기(predictors) 생성
     predictors = []
     
     for predictor in selected_predictors:
@@ -39,17 +40,17 @@ def process_image(image_path, selected_detectors, selected_predictors):
         target_encodings = np.array(pickle.load(f))
 
     # 파이프라인 설정
-    pipeline = Pipeline(
-        steps.FaceDetector(detectors),                    
-        steps.FaceEncoder(),                            
-        steps.TargetFaceMatcher(target_encodings),        
-        steps.FacePredictor(predictors),                  
-        steps.FaceInfoCounter(),                      
-        steps.InfoDrawer(),                             
-        steps.InfoWriter(),                            
-        steps.ImageResizer(target_size=1000),             
-        steps.Saver(),                                 
-    )
+    pipeline = Pipeline()
+    pipeline.add(steps.FaceDetector(detectors))                    
+    pipeline.add(steps.FaceEncoder())                           
+    pipeline.add(steps.TargetFaceMatcher(target_encodings))      
+    pipeline.add(steps.FacePredictor(predictors))                
+    pipeline.add(steps.FaceInfoCounter())                     
+    pipeline.add(steps.InfoDrawer())
+    if predictors:                            
+        pipeline.add(steps.InfoWriter(font_size = 30))  
+    # pipeline.add(steps.ImageResizer(target_size=1000))      
+    pipeline.add(steps.Saver())                                 
     
     image_path
     logging.info(f"이미지 처리 시작: {image_path}")
