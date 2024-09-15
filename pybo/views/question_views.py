@@ -5,9 +5,10 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.urls import reverse
 
-from ..ai_system.ai_pybo import start_ai
 from ..forms import QuestionForm
 from ..models import Question, Answer
+
+from .ai import process_image
 
 ########################################################################################################
 
@@ -35,7 +36,7 @@ def question_create(request):
                 # 탐지기나 예측기가 선택되었는지 확인
                 if selected_detectors or selected_predictors:
                     # AI 모델을 이용해 이미지 처리
-                    result_image_path = start_ai(request, image_path, selected_detectors, selected_predictors)
+                    result_image_path = process_image(image_path, selected_detectors, selected_predictors)
                     
                     # AI 처리 결과를 포함한 답변 생성
                     answer = Answer(
