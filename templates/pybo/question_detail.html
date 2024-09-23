@@ -14,18 +14,14 @@
         </div>
     {% endif %}
 
-    {% comment %} 질문 제목 {% endcomment %}
-    <h2 class="border-bottom py-2">
-        {{ question.subject }}
-    </h2>
+    {% comment %} 질문 제목 및 정보 {% endcomment %}
+    <h2 class="border-bottom py-2">{{ question.subject }}</h2>
 
     <div class="card-body">
-        {% comment %} 질문 내용 {% endcomment %}
-        <div class="card-text">
-            {{ question.content|mark }}
-        </div>
+        {% comment %} 질문 내용 표시 {% endcomment %}
+        <div class="card-text">{{ question.content|mark }}</div>
 
-        {% comment %} 질문 수정 날짜 및 작성자 정보 {% endcomment %}
+        {% comment %} 질문 작성 및 수정 정보 표시 {% endcomment %}
         <div class="d-flex justify-content-end">
             {% if question.modify_date %}
                 <div class="badge bg-light text-dark p-2 text-start mx-3">
@@ -39,28 +35,44 @@
             </div>
         </div>
 
-        {% comment %} 업로드된 이미지 표시 (이미지1) {% endcomment %}
+        {% comment %} 업로드된 이미지1 표시 {% endcomment %}
         {% if question.image1 %}
             <div>
-                <h5>업로드된 이미지1:</h5>
+                <h5>...</h5>
                 <img src="{{ question.image1.url }}" alt="Uploaded Image" style="max-width: 300px; height: auto;">
             </div>
         {% endif %}
-        {% comment %} 업로드된 이미지 표시 (이미지2) {% endcomment %}
+
+        {% comment %} 업로드된 이미지2 표시 {% endcomment %}
         {% if question.image2 %}
             <div>
-                <h5>업로드된 이미지2:</h5>
+                <h5> </h5>
                 <img src="{{ question.image2.url }}" alt="Uploaded Image" style="max-width: 300px; height: auto;">
             </div>
         {% endif %}
 
-        {% comment %} 추천 버튼 및 수정/삭제 버튼 {% endcomment %}
+        {% comment %} 업로드된 이미지3 표시 {% endcomment %}
+        {% if question.image3 %}
+            <div>
+                <h5> </h5>
+                <img src="{{ question.image3.url }}" alt="Uploaded Image" style="max-width: 300px; height: auto;">
+            </div>
+        {% endif %}
+
+        {% comment %} 업로드된 이미지4 표시 {% endcomment %}
+        {% if question.image4 %}
+            <div>
+                <h5> </h5>
+                <img src="{{ question.image4.url }}" alt="Uploaded Image" style="max-width: 300px; height: auto;">
+            </div>
+        {% endif %}
+
+        {% comment %} 추천 및 수정/삭제 버튼 {% endcomment %}
         <div class="my-3">
             <a href="javascript:void(0)" data-uri="{% url 'pybo:question_vote' question.id %}" class="recommend btn btn-sm btn-outline-secondary">
-                추천
-                <span class="badge rounded-pill bg-success">{{ question.voter.count }}</span>
+                추천 <span class="badge rounded-pill bg-success">{{ question.voter.count }}</span>
             </a>
-            
+
             {% if request.user == question.author %}
                 <a href="{% url 'pybo:question_modify' question.id %}" class="btn btn-sm btn-outline-secondary">수정</a>
                 <a href="javascript:void(0)" class="delete btn btn-sm btn-outline-secondary" data-uri="{% url 'pybo:question_delete' question.id %}">
@@ -102,9 +114,7 @@
     </div>
 
     {% comment %} 답변 수 표시 {% endcomment %}
-    <h5 class="border-bottom my-3 py-2">
-        {{ question.answer_set.count }}개의 답변이 있습니다.
-    </h5>
+    <h5 class="border-bottom my-3 py-2">{{ question.answer_set.count }}개의 답변이 있습니다.</h5>
 
     {% comment %} 답변 리스트 표시 {% endcomment %}
     {% for answer in question.answer_set.all %}
@@ -113,7 +123,15 @@
             <div class="card-body">
                 <div class="card-text">
                     {{ answer.content|mark }}
+                    {% if answer.answer_image %}
+                        <div>
+                            <h5>업로드된 이미지:</h5>
+                            <img src="{{ answer.answer_image.url }}" alt="Uploaded Image" style="max-width: 300px; height: auto;">
+                        </div>
+                    {% endif %}
                 </div>
+
+                {% comment %} 답변 작성 및 수정 정보 표시 {% endcomment %}
                 <div class="d-flex justify-content-end">
                     {% if answer.modify_date %}
                         <div class="badge bg-light text-dark p-2 text-start mx-3">
@@ -126,10 +144,11 @@
                         <div>{{ answer.create_date }}</div>
                     </div>
                 </div>
+
+                {% comment %} 답변에 대한 추천 및 수정/삭제 버튼 {% endcomment %}
                 <div class="my-3">
                     <a href="javascript:void(0)" data-uri="{% url 'pybo:question_vote' question.id %}" class="recommend btn btn-sm btn-outline-secondary">
-                        추천
-                        <span class="badge rounded-pill bg-success">{{ question.voter.count }}</span>
+                        추천 <span class="badge rounded-pill bg-success">{{ question.voter.count }}</span>
                     </a>
                     {% if request.user == answer.author %}
                         <a href="{% url 'pybo:answer_modify' answer.id %}" class="btn btn-sm btn-outline-secondary">수정</a>
@@ -141,7 +160,7 @@
     {% endfor %}
 
     {% comment %} 답변 등록 폼 {% endcomment %}
-    <form action="{% url 'pybo:answer_create' question.id %}" method="post" class="my-3">
+    <form action="{% url 'pybo:answer_create' question.id %}" method="post" enctype="multipart/form-data" class="my-3">
         {% csrf_token %}
         {% include "form_errors.html" %}
         <div class="form-group">
@@ -154,26 +173,24 @@
 
 {% block script %}
 <script>
-    {% comment %} 삭제 버튼 클릭 시 확인 대화상자 {% endcomment %}
-    const delete_elements = document.getElementsByClassName("delete");
+    $(document).ready(function() {
 
-    Array.from(delete_elements).forEach(function(element) {
-        element.addEventListener('click', function() {
-            if(confirm("정말로 삭제하시겠습니까?")) {
-                location.href = this.dataset.uri;
-            };
+        // 삭제 버튼 클릭 시 확인 대화상자
+        $('.delete').on('click', function() {
+            if (confirm("정말로 삭제하시겠습니까?")) {
+                location.href = $(this).data('uri');  // jQuery에서 data-attribute 접근
+            }
         });
-    });
 
-    {% comment %} 추천 버튼 클릭 시 확인 대화상자 {% endcomment %}
-    const recommend_elements = document.getElementsByClassName("recommend");
-
-    Array.from(recommend_elements).forEach(function(element) {
-        element.addEventListener('click', function() {
-            if(confirm("정말로 추천하시겠습니까?")) {
-                location.href = this.dataset.uri;
-            };
+        // 추천 버튼 클릭 시 확인 대화상자
+        $('.recommend').on('click', function() {
+            if (confirm("정말로 추천하시겠습니까?")) {
+                location.href = $(this).data('uri');  // jQuery에서 data-attribute 접근
+            }
         });
+
     });
 </script>
 {% endblock %}
+
+

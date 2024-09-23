@@ -6,13 +6,15 @@ from pybo.models import Question, Answer,Comment
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['subject', 'content', 'image1','image2'] # subject와 content 필드만 사용 #내용없애고 image만 추가
+        fields = ['subject', 'content', 'image1','image2', 'image3', 'image4'] # subject와 content 필드만 사용 #내용없애고 image만 추가
         labels = {
 
             'subject': '제목',
             'content' :'내용',
             'image1' : '이미지1',
             'image2' : '이미지2',
+            'image3' : '이미지3',
+            'image4': '이미지4',
         }
         
         # widgets = {

@@ -32,10 +32,14 @@ class Question(models.Model):
     voter = models.ManyToManyField(User, related_name='voter_question')
     
     # 이미지1: 질문에 첨부된 이미지, null과 빈 값을 허용
-    image1 = models.ImageField(upload_to='image1/', null=False, blank=False, verbose_name='업로드 이미지1')
+    image1 = models.ImageField(upload_to='image1/', null=True, blank=True, verbose_name='업로드 이미지1')
     
     # 이미지2: 질문에 첨부된 두 번째 이미지, null과 빈 값을 허용
-    image2 = models.ImageField(upload_to='image2/', null=False, blank=False, verbose_name='업로드 이미지2')
+    image2 = models.ImageField(upload_to='image2/', null=True, blank=True, verbose_name='업로드 이미지2')
+
+    image3 = models.ImageField(upload_to='image3/', null=True, blank=True, verbose_name='업로드 이미지3')
+
+    image4 = models.ImageField(upload_to='image4/', null=True, blank=True, verbose_name='업로드 이미지4')
 
     #save 메서드를 사용해서 기존 파일을 삭제하고 새 파일로 교체
     def save(self,*args,**kwargs):
@@ -48,6 +52,7 @@ class Question(models.Model):
             if old_objects.image2 and old_objects.image2 != self.image2:
                 if os.path.isfile(old_objects.image2.path):
                     os.remove(old_objects.image2.path)
+
         #장고의 save 메세지를 호출하여 모델 인스턴스에 저장
         super(Question,self).save(*args,*kwargs)
 
